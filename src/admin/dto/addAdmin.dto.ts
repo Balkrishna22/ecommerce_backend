@@ -5,5 +5,7 @@ export class AddAdminDto {
     readonly createDate: Date;
     readonly updateDate: Date;
     readonly status: string;
+    readonly authToken: string;
+
   }
   

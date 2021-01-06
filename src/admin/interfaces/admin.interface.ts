@@ -7,4 +7,5 @@ export interface Admin extends Document {
     readonly status: string;
     readonly createDate: Date;
     readonly updateDate: Date;
+    readonly authToken: string;
 }

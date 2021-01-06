@@ -18,18 +18,18 @@ export class AdminController {
     @Post('addAdmin')
     async addAdmin(@Res() res, @Body() AddAdminDto: AddAdminDto) {
         const addedUser = await this.adminService.addAdmin(AddAdminDto);
-        return res.status(HttpStatus.OK).json({ data: addedUser });
+        return res.status(HttpStatus.OK).json({ status: true, data: addedUser });
     }
 
     @Post('login')
     async login(@Res() res, @Body() loginAdminDto: loginAdminDto) {
         const loggedInAdmin = await this.adminService.loginAdmin(loginAdminDto);
-        return res.status(HttpStatus.OK).json({ key: loggedInAdmin });
+        return res.status(HttpStatus.OK).json({ status: true, data: loggedInAdmin });
     }
 
     @Get('dashBoard')
     async dashBoard(@Res() res) {
         const data = await this.adminService.dashBoard();
-        return res.status(HttpStatus.OK).json({ key: data });
+        return res.status(HttpStatus.OK).json({ status: true, data: data });
     }
 }

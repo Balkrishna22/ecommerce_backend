@@ -8,4 +8,5 @@ export const productSchema = new mongoose.Schema({
   category: String,
   createDate: Date,
   updateDate: Date,
+  authToken : String
 });

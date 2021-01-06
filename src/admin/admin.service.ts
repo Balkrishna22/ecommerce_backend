@@ -33,11 +33,11 @@ export class AdminService {
                 updateDate: Date(),
             });
             if (!addedAdmin) {
-                throw new HttpException('admin not added', 404);
+                throw new HttpException('admin not added', 400);
             }
             return addedAdmin.save();
         } else {
-            throw new HttpException('email already exist ', 404);
+            throw new HttpException('email already exist ', 400);
         }
 
     }
@@ -47,7 +47,7 @@ export class AdminService {
             email: loginAdminDto.email,
         }).exec();
         if (!loginAdmin) {
-            throw new HttpException('Admin not found', 404);
+            throw new HttpException('Admin not found', 400);
         }
         const isMatch = await bcrypt.compare(
             loginAdminDto.password,
@@ -56,7 +56,7 @@ export class AdminService {
         if (isMatch) {
             return loginAdmin;
         }
-        throw new HttpException('Incorrect password', 404);
+        throw new HttpException('Incorrect password', 400);
     }
 
     async dashBoard() {

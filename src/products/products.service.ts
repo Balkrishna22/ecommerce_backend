@@ -3,6 +3,8 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './interfaces/product.interface';
 import { AddProductDto } from './dto/addProduct.dto';
+import { updateProductDto } from './dto/updateProduct.dto';
+const fs = require('fs')
 
 @Injectable()
 export class ProductsService {
@@ -21,9 +23,17 @@ export class ProductsService {
             updateDate: Date(),
         });
         if (!addedProduct) {
-            throw new HttpException('Product not added', 404);
+            throw new HttpException('Product not added', 400);
         }
         return addedProduct.save();
+    }
+
+    async updateproduct(file, updateProductDto: updateProductDto): Promise<Product> {
+        const record = await this.ProductModel.findOne({ _id: updateProductDto.id }).exec()
+        fs.unlinkSync("./uploads/products/" + record.image)
+        updateProductDto.image = file.filename
+        const updateData = await this.ProductModel.updateOne({ _id: updateProductDto.id }, updateProductDto).exec()
+        return updateData
     }
 
     async getProducts(): Promise<Product[]> {
