@@ -4,45 +4,65 @@ import { loginAdminDto } from './dto/adminLogin.dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Admin } from './interfaces/admin.interface';
+import { User } from '../user/interfaces/user.interface';
+import { Product } from '../products/interfaces/product.interface';
+
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
-  constructor(
-    @InjectModel('admin')
-    private readonly AdminModel: Model<Admin>,
-  ) {}
+    constructor(
+        @InjectModel('admin')
+        private readonly AdminModel: Model<Admin>,
+        @InjectModel('user')
+        private readonly userModel: Model<User>,
+        @InjectModel('product')
+        private readonly productModel: Model<Product>,
+    ) { }
 
-  async addAdmin(AddAdminDto: AddAdminDto): Promise<Admin> {
-    AddAdminDto.password = await bcrypt.hash(AddAdminDto.password, 10);
-    const addedAdmin = await new this.AdminModel({
-      name: AddAdminDto.name,
-      email: AddAdminDto.email,
-      password: AddAdminDto.password,
-      status: true,
-      createDate: Date(),
-      updateDate: Date(),
-    });
-    if (!addedAdmin) {
-      throw new HttpException('admin not added', 404);
-    }
-    return addedAdmin.save();
-  }
+    async addAdmin(AddAdminDto: AddAdminDto): Promise<Admin> {
+        const existAdmin = await this.AdminModel.findOne({ email: AddAdminDto.email }).exec()
+        if (!existAdmin) {
+            AddAdminDto.password = await bcrypt.hash(AddAdminDto.password, 10);
+            const addedAdmin = await new this.AdminModel({
+                name: AddAdminDto.name,
+                email: AddAdminDto.email,
+                password: AddAdminDto.password,
+                status: true,
+                createDate: Date(),
+                updateDate: Date(),
+            });
+            if (!addedAdmin) {
+                throw new HttpException('admin not added', 404);
+            }
+            return addedAdmin.save();
+        } else {
+            throw new HttpException('email already exist ', 404);
+        }
 
-  async loginAdmin(loginAdminDto: loginAdminDto): Promise<Admin> {
-    const loginAdmin = await this.AdminModel.findOne({
-      email: loginAdminDto.email,
-    }).exec();
-    if (!loginAdmin) {
-      throw new HttpException('Admin not found', 404);
     }
-    const isMatch = await bcrypt.compare(
-      loginAdminDto.password,
-      loginAdmin.password,
-    );
-    if (isMatch) {
-      return loginAdmin;
+
+    async loginAdmin(loginAdminDto: loginAdminDto): Promise<Admin> {
+        const loginAdmin = await this.AdminModel.findOne({
+            email: loginAdminDto.email,
+        }).exec();
+        if (!loginAdmin) {
+            throw new HttpException('Admin not found', 404);
+        }
+        const isMatch = await bcrypt.compare(
+            loginAdminDto.password,
+            loginAdmin.password,
+        );
+        if (isMatch) {
+            return loginAdmin;
+        }
+        throw new HttpException('Incorrect password', 404);
     }
-    throw new HttpException('Incorrect password', 404);
-  }
+
+    async dashBoard() {
+        const count = { users: 0, products: 0 }
+        count.users = await this.userModel.find().countDocuments().exec();
+        count.products = await this.productModel.find().countDocuments().exec();
+        return count
+    }
 }
