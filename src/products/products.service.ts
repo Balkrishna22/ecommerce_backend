@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './interfaces/product.interface';
 import { AddProductDto } from './dto/addProduct.dto';
 import { updateProductDto } from './dto/updateProduct.dto';
+import { concat } from 'rxjs';
 const fs = require('fs')
 
 @Injectable()
@@ -21,6 +22,7 @@ export class ProductsService {
             price: AddProductDto.price,
             createDate: Date(),
             updateDate: Date(),
+            status: true,
         });
         if (!addedProduct) {
             throw new HttpException('Product not added', 400);
@@ -36,10 +38,21 @@ export class ProductsService {
         return updateData
     }
 
-    async getProducts(): Promise<Product[]> {
-        const products = await this.ProductModel.find().exec();
-        return products;
-    }
+    // async getProducts(): Promise<Product[]> {
+    //     const products = await this.ProductModel.aggregate([
+    //         {
+    //             $project: {
+    //                 productName: 1,
+    //                 discription: 1,
+    //                 category: 1,
+    //                 price: 1,
+    //                 status: 1,
+    //                 image: { $concat: ["./uploads/products", "$image"] }
+    //             }
+    //         }
+    //     ]).exec();
+    //     return products;
+    // }
 
     async getProductById(id): Promise<Product[]> {
         const product = await this.ProductModel.find({ _id: id }).exec();
@@ -52,10 +65,28 @@ export class ProductsService {
     }
 
     async sortByName(search): Promise<Product[]> {
-        const product = await this.ProductModel.find({
-            productName: new RegExp(search, 'i'), // provides all when no arguments passed
-        }).exec();
-        return product;
+        const products = await this.ProductModel.aggregate([
+            {
+                $match: {
+                    productName: new RegExp(search, 'i')
+                }
+            },
+            {
+                $project: {
+                    productName: 1,
+                    discription: 1,
+                    category: 1,
+                    price: 1,
+                    status: 1,
+                    image: { $concat: ["./uploads/products/", "$image"] }
+                }
+            }
+        ]).exec();
+        return products;
+        // const product = await this.ProductModel.find({
+        //     productName: new RegExp(search, 'i'), // provides all when no arguments passed
+        // }).exec();
+        // return product;
     }
 
     async countProducts(getData) {
@@ -66,6 +97,8 @@ export class ProductsService {
     }
 
     async deleteProduct(id) {
+        const record = await this.ProductModel.findOne({ _id: id }).exec()
+        fs.unlinkSync("./uploads/products/" + record.image)
         const result = await this.ProductModel.deleteOne({ _id: id }).exec()
         return result
     }

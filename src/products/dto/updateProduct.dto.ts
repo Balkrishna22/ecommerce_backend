@@ -1,12 +1,16 @@
 import { ObjectId } from "mongoose";
+import { IsInt, IsNotEmpty, IsNumberString } from 'class-validator';
+
 
 export class updateProductDto {
-    readonly productName: string;
-    readonly discription: string;
-    readonly category: string;
-    readonly price : number;
-    readonly updateDate : Date ;
-    image : string ;
-    readonly id : ObjectId
+    @IsNotEmpty() productName: string;
+    @IsNotEmpty() image: string;
+    @IsNotEmpty() discription: string;
+    @IsNotEmpty() category: string;
+    @IsNumberString() price: number;
+    readonly updateDate: Date;
+    readonly createDate: Date;
+    readonly status: boolean
+    readonly id : ObjectId 
   }
   

@@ -1,6 +1,8 @@
+import { IsEmail, IsNotEmpty } from 'class-validator';
+
+
 export class loginAdminDto {
-    password: string;
-   readonly email: string;
-   readonly name: string;
+    @IsNotEmpty() password: string;
+    @IsEmail() email: string;
  }
  

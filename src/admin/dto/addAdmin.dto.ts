@@ -1,11 +1,12 @@
+import { IsEmail, IsNotEmpty } from 'class-validator';
+
 export class AddAdminDto {
-    readonly name: string;
+    @IsNotEmpty() name: string;
      password: string;
-    readonly email: string;
+    @IsEmail() email: string;
     readonly createDate: Date;
     readonly updateDate: Date;
     readonly status: string;
     readonly authToken: string;
-
   }
   
