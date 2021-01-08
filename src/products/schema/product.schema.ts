@@ -9,5 +9,5 @@ export const productSchema = new mongoose.Schema({
     createDate: Date,
     updateDate: Date,
     authToken: String,
-    status: Boolean
+    status: String
 });

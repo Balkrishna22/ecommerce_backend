@@ -10,7 +10,7 @@ export class updateProductDto {
     @IsNumberString() price: number;
     readonly updateDate: Date;
     readonly createDate: Date;
-    readonly status: boolean
+    readonly status: string
     readonly id : ObjectId 
   }
   

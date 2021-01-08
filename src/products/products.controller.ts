@@ -9,6 +9,7 @@ import {
     UseInterceptors,
     UploadedFile,
     Query,
+    HttpException,
     Delete
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
@@ -41,30 +42,30 @@ export class ProductsController {
         @UploadedFile() image,
         @Res() res,
         @Body() AddProductDto: AddProductDto,
-    ) {        
+    ) {
         const addedProduct = await this.productsService.addProduct(
             image,
             AddProductDto,
         );
-        return res.status(HttpStatus.OK).json({ status: true, data: addedProduct });
+        return res.status(HttpStatus.OK).json({ status: true, data: addedProduct ,message :'Product added successfully.' });
     }
 
     @Get('productDetail/:id')
     async getProductById(@Res() res, @Param('id') id) {
         const data = await this.productsService.getProductById(id);
-        return res.status(HttpStatus.OK).json({ status: true, data: data });
+        return res.status(HttpStatus.OK).json({ status: true, data: data , message :'Product details' });
     }
 
     @Get('priceFilter')
-    async sortByFilter(@Res() res) {
-        const data = await this.productsService.sortByFilter();
-        return res.status(HttpStatus.OK).json({ status: true, data: data });
+    async sortByFilter(@Res() res, @Query('sort') sort) {
+        const data = await this.productsService.sortByFilter(sort);
+        return res.status(HttpStatus.OK).json({ status: true, data: data , message : 'All products filtered according price '});
     }
 
     @Get('all')
     async sortByName(@Res() res, @Query() search) {
         const data = await this.productsService.sortByName(search);
-        return res.status(HttpStatus.OK).json({ status: true, data: data });
+        return res.status(HttpStatus.OK).json({ status: true, data: data , message : 'All Products list'});
     }
 
     @Get('productCount')
@@ -76,7 +77,10 @@ export class ProductsController {
     @Delete('deleteProduct')
     async deleteProduct(@Res() res, @Query('id') id) {
         const data = await this.productsService.deleteProduct(id);
-        return res.status(HttpStatus.OK).json({ status: true, data: data });
+        if (!data) {
+            throw new HttpException('error occured ', 401);
+        }
+        return res.status(HttpStatus.OK).json({ status: true, message: 'product deleted successfully', data: data });
     }
 
     @Post('updateProduct')
@@ -95,7 +99,11 @@ export class ProductsController {
         }),
     )
     async updateproduct(@UploadedFile() image, @Res() res, @Body() updateProductDto: updateProductDto) {
+        if (!image) {
+            const data = await this.productsService.updateProductWithoutImage(updateProductDto);
+            return res.status(HttpStatus.OK).json({ status: true, data: data });
+        }
         const data = await this.productsService.updateproduct(image, updateProductDto);
-        return res.status(HttpStatus.OK).json({ status: true, data: data });
+        return res.status(HttpStatus.OK).json({ status: true, data: data , message : 'Product updated successfully' });
     }
 }

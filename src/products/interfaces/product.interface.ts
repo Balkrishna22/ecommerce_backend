@@ -8,5 +8,5 @@ export interface Product extends Document {
     readonly category: string;
     readonly createDate: Date;
     readonly updateDate: Date;
-    readonly status : boolean 
+    readonly status : string 
 }

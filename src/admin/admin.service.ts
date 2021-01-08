@@ -71,4 +71,28 @@ export class AdminService {
         count.products = await this.productModel.find().countDocuments().exec();
         return count
     }
+
+
+    async updateUserStatus(userId) {
+        const users = await this.userModel.findOne({ _id: userId })
+        if (users.status == 'true' || users.status == 'ACTIVE') {
+            const data = await this.userModel.updateOne({ _id: userId }, { status: 'INACTIVE' }).exec()
+            return data
+        } else {
+            const data = await this.userModel.updateOne({ _id: userId }, { status: 'ACTIVE' }).exec()
+            return data
+        }
+    }
+    async upadetProductStatus(productId) {
+        const products = await this.productModel.findOne({ _id: productId })
+        if (products.status == 'true' || products.status == 'ACTIVE') {
+            const data = await this.productModel.updateOne({ _id: productId }, { status: 'INACTIVE' }).exec()
+            return data
+        } else {
+            const data = await this.userModel.updateOne({ _id: productId }, { status: 'ACTIVE' }).exec()
+            return data
+        }
+    }
+
+
 }

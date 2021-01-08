@@ -22,7 +22,7 @@ export class UserService {
                 name: AddUserDto.name,
                 email: AddUserDto.email,
                 password: AddUserDto.password,
-                status: true,
+                status: "ACTIVE", // ACTIVE, INACTIVE
                 createDate: Date(),
                 updateDate: Date(),
             });
@@ -34,7 +34,6 @@ export class UserService {
             throw new HttpException('Email already exist', 404);
 
         }
-
     }
 
     async loginUser(loginUserDto: loginUserDto): Promise<User> {
