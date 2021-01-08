@@ -6,6 +6,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Admin } from './interfaces/admin.interface';
 import { User } from '../user/interfaces/user.interface';
 import { Product } from '../products/interfaces/product.interface';
+var randomstring = require("randomstring");
 
 import * as bcrypt from 'bcrypt';
 
@@ -43,6 +44,10 @@ export class AdminService {
     }
 
     async loginAdmin(loginAdminDto: loginAdminDto): Promise<Admin> {
+        const authToken = randomstring.generate({
+            length: 300,
+            charset: 'alphanumeric'
+        });
         const loginAdmin = await this.AdminModel.findOne({
             email: loginAdminDto.email,
         }).exec();
@@ -54,6 +59,7 @@ export class AdminService {
             loginAdmin.password,
         );
         if (isMatch) {
+            this.AdminModel.updateOne({ email: loginAdminDto.email }, { authToken: authToken }).exec()
             return loginAdmin;
         }
         throw new HttpException('Incorrect password', 400);

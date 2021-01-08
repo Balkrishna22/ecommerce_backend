@@ -15,7 +15,7 @@ export class UserService {
     ) { }
 
     async addUser(AddUserDto: AddUserDto): Promise<User> {
-        const existUser = await await this.UserModel.findOne({ email: AddUserDto.email }).exec()
+        const existUser = await this.UserModel.findOne({ email: AddUserDto.email }).exec()
         if (!existUser) {
             AddUserDto.password = await bcrypt.hash(AddUserDto.password, 10);
             const addedUser = await new this.UserModel({

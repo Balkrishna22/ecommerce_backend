@@ -32,7 +32,9 @@ export class ProductsService {
 
     async updateproduct(file, updateProductDto: updateProductDto): Promise<Product> {
         const record = await this.ProductModel.findOne({ _id: updateProductDto.id }).exec()
-        fs.unlinkSync("./uploads/products/" + record.image)
+        if (fs.existsSync("./uploads/products/" + record.image)) {
+            fs.unlinkSync("./uploads/products/" + record.image)
+        }
         updateProductDto.image = file.filename
         const updateData = await this.ProductModel.updateOne({ _id: updateProductDto.id }, updateProductDto).exec()
         return updateData
@@ -64,13 +66,23 @@ export class ProductsService {
         return product;
     }
 
-    async sortByName(search): Promise<Product[]> {
+    async sortByName(search): Promise<any> {
+        // pagination 
+    console.log(search);
+        var pagination = { skip: 0, limit: 10, totalRecord: 0 };
+        if (search.limit) {
+            pagination.limit = Number(search.limit);
+            if (search.page) {
+                var skip = search.limit * (search.page - 1);
+                pagination.skip = Number(skip);
+            }
+        }
         const products = await this.ProductModel.aggregate([
             {
                 $match: {
                     productName: new RegExp(search, 'i')
                 }
-            },
+            }, { $skip: 0 }, { $limit: parseInt(search.limit)  },
             {
                 $project: {
                     productName: 1,
@@ -78,16 +90,18 @@ export class ProductsService {
                     category: 1,
                     price: 1,
                     status: 1,
-                    image: { $concat: ["./uploads/products/", "$image"] }
+                    image: { $concat: ["/uploads/products/", "$image"] }
                 }
-            }
-        ]).exec();
-        return products;
-        // const product = await this.ProductModel.find({
-        //     productName: new RegExp(search, 'i'), // provides all when no arguments passed
-        // }).exec();
-        // return product;
+            },
+            { $limit: pagination.limit },
+            { $skip: pagination.skip }
+        ]
+        ).exec()
+        var productsCount = await this.ProductModel.countDocuments().exec();
+        return { products, productsCount };
     }
+
+
 
     async countProducts(getData) {
         const counts = await this.ProductModel.find({ category: getData })

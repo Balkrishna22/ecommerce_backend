@@ -8,4 +8,5 @@ export const adminSchema = new mongoose.Schema({
   status : String,
   createDate : Date ,
   updateDate :  Date ,
+  authToken : String
 });

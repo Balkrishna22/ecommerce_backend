@@ -41,7 +41,7 @@ export class ProductsController {
         @UploadedFile() image,
         @Res() res,
         @Body() AddProductDto: AddProductDto,
-    ) {
+    ) {        
         const addedProduct = await this.productsService.addProduct(
             image,
             AddProductDto,
@@ -62,7 +62,7 @@ export class ProductsController {
     }
 
     @Get('all')
-    async sortByName(@Res() res, @Query('search') search) {
+    async sortByName(@Res() res, @Query() search) {
         const data = await this.productsService.sortByName(search);
         return res.status(HttpStatus.OK).json({ status: true, data: data });
     }

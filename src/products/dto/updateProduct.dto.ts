@@ -4,7 +4,7 @@ import { IsInt, IsNotEmpty, IsNumberString } from 'class-validator';
 
 export class updateProductDto {
     @IsNotEmpty() productName: string;
-    @IsNotEmpty() image: string;
+     image: string;
     @IsNotEmpty() discription: string;
     @IsNotEmpty() category: string;
     @IsNumberString() price: number;
