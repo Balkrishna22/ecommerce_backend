@@ -56,12 +56,6 @@ export class ProductsController {
         return res.status(HttpStatus.OK).json({ status: true, data: data , message :'Product details' });
     }
 
-    @Get('priceFilter')
-    async sortByFilter(@Res() res, @Query('sort') sort) {
-        const data = await this.productsService.sortByFilter(sort);
-        return res.status(HttpStatus.OK).json({ status: true, data: data , message : 'All products filtered according price '});
-    }
-
     @Get('all')
     async sortByName(@Res() res, @Query() search) {
         const data = await this.productsService.sortByName(search);

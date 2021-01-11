@@ -66,51 +66,110 @@ export class ProductsService {
     // }
 
     async getProductById(id): Promise<Product[]> {
-        const product = await this.ProductModel.find({ _id: id }).exec();
-        return product;
+        var products = await this.ProductModel.find({ _id: id }).exec();
+        products[0].image = "http://13.233.99.68:8000/uploads/products/" + products[0].image
+        return products;
     }
 
-    async sortByFilter(sort): Promise<Product[]> {
-        if (sort == 'des') {
-            const product = await this.ProductModel.find().sort({ price: -1 }).exec(); // use -1 for desending
-            return product;
-        } else {
-            const product = await this.ProductModel.find().sort({ price: 1 }).exec(); // use -1 for desending
-            return product;
+
+
+    async sortByName(getData): Promise<any> {
+        // var pagination = { skip: 0, limit: 10, totalRecord: 0 };
+        // if (search.limit) {
+        //     pagination.limit = Number(search.limit);
+        //     if (search.page) {
+        //         var skip = parseInt(search.limit) * (search.page - 1);
+        //         pagination.skip = Number(skip);
+        //     }
+        // }
+
+        if (!getData.sort) {
+            const products = await this.ProductModel.aggregate([
+                {
+                    $match: {
+                        productName: new RegExp(getData.search, 'i')
+                    }
+                }
+                ,
+                {
+                    $project: {
+                        productName: 1,
+                        discription: 1,
+                        category: 1,
+                        price: 1,
+                        status: 1,
+                        image: { $concat: ["http://13.233.99.68:8000/uploads/products/", "$image"] }
+                    }
+                },
+                // { $limit: Number(pagination.limit) },
+                // { $skip: Number(pagination.skip) }
+            ]
+            ).exec()
+            //   var productsCount = await this.ProductModel.countDocuments().exec();
+            return { products };
         }
-    }
-
-    async sortByName(search): Promise<any> {
-        var pagination = { skip: 0, limit: 10, totalRecord: 0 };
-        if (search.limit) {
-            pagination.limit = Number(search.limit);
-            if (search.page) {
-                var skip = parseInt(search.limit) * (search.page - 1);
-                pagination.skip = Number(skip);
+        else {
+            if (getData.sort == 'des') {
+                const products = await this.ProductModel.aggregate([
+                    {
+                        $match: {
+                            productName: new RegExp(getData.search, 'i')
+                        }
+                    }, {
+                        $sort: {
+                            price: -1
+                        }
+                    }
+                    ,
+                    {
+                        $project: {
+                            productName: 1,
+                            discription: 1,
+                            category: 1,
+                            price: 1,
+                            status: 1,
+                            image: { $concat: ["http://13.233.99.68:8000/uploads/products/", "$image"] }
+                        }
+                    },
+                    // { $limit: Number(pagination.limit) },
+                    // { $skip: Number(pagination.skip) }
+                ]
+                ).exec()
+                //   var productsCount = await this.ProductModel.countDocuments().exec();
+                return { products };
+            } else {
+                const products = await this.ProductModel.aggregate([
+                    {
+                        $match: {
+                            productName: new RegExp(getData.search, 'i')
+                        }
+                    }, {
+                        $sort: {
+                            price: 1
+                        }
+                    }
+                    ,
+                    {
+                        $project: {
+                            productName: 1,
+                            discription: 1,
+                            category: 1,
+                            price: 1,
+                            status: 1,
+                            image: { $concat: ["http://13.233.99.68:8000/uploads/products/", "$image"] }
+                        }
+                    },
+                    // { $limit: Number(pagination.limit) },
+                    // { $skip: Number(pagination.skip) }
+                ]
+                ).exec()
+                //   var productsCount = await this.ProductModel.countDocuments().exec();
+                return { products };
             }
         }
-        const products = await this.ProductModel.aggregate([
-            {
-                $match: {
-                    productName: new RegExp(search, 'i')
-                }
-            },
-            {
-                $project: {
-                    productName: 1,
-                    discription: 1,
-                    category: 1,
-                    price: 1,
-                    status: 1,
-                    image: { $concat: ["http://13.233.99.68:8000/uploads/products/", "$image"] }
-                }
-            },
-            { $limit: Number(pagination.limit) },
-            { $skip: Number(pagination.skip) }
-        ]
-        ).exec()
-        var productsCount = await this.ProductModel.countDocuments().exec();
-        return { products, productsCount };
+
+
+
     }
 
 
