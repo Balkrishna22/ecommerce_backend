@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Product } from './interfaces/product.interface';
 import { AddProductDto } from './dto/addProduct.dto';
 import { updateProductDto } from './dto/updateProduct.dto';
+import { QueryOptions } from '../configs/query-options.config';
 const fs = require('fs')
 
 @Injectable()
