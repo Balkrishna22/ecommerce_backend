@@ -89,7 +89,8 @@ export class AdminService {
             const data = await this.productModel.updateOne({ _id: productId }, { status: 'INACTIVE' }).exec()
             return data
         } else {
-            const data = await this.userModel.updateOne({ _id: productId }, { status: 'ACTIVE' }).exec()
+            const data = await this.productModel.updateOne({ _id: productId }, { status: 'ACTIVE' }).exec()
+
             return data
         }
     }
