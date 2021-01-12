@@ -43,7 +43,14 @@ export class ProductsService {
 
     async updateProductWithoutImage(updateProductDto: updateProductDto): Promise<Product> {
         // updateProductDto.image = file.filename
-        const updateData = await this.ProductModel.updateOne({ _id: updateProductDto.id }, updateProductDto).exec()
+        const updateData = await this.ProductModel.updateOne({ _id: updateProductDto.id }, {
+            productName : updateProductDto.productName,
+            price : updateProductDto.price,
+            discription : updateProductDto.discription,
+            status : updateProductDto.status,
+            category : updateProductDto.category,
+            updateDate : new Date()
+        }).exec()
         return updateData
     }
 

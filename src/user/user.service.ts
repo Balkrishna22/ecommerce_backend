@@ -32,7 +32,6 @@ export class UserService {
             return addedUser.save();
         } else {
             throw new HttpException('Email already exist', 404);
-
         }
     }
 
