@@ -14,15 +14,19 @@ export class ProductsService {
         private readonly ProductModel: Model<Product>,
     ) { }
     async addProduct(file, AddProductDto: AddProductDto): Promise<Product> {
+        var images = []
+        file.image.map(elements => {
+            images.push(elements.filename);
+        })
         const addedProduct = new this.ProductModel({
             productName: AddProductDto.productName,
-            image: file.filename,
+            image: images,
             discription: AddProductDto.discription,
             category: AddProductDto.category,
             price: AddProductDto.price,
             createDate: Date(),
             updateDate: Date(),
-            status: "ACTIVE", // ACTIVE, INACTIVE
+            status: "ACTIVE", // ACTIVE , INACTIVE
         });
         if (!addedProduct) {
             throw new HttpException('Product not added', 400);
@@ -44,33 +48,43 @@ export class ProductsService {
     async updateProductWithoutImage(updateProductDto: updateProductDto): Promise<Product> {
         // updateProductDto.image = file.filename
         const updateData = await this.ProductModel.updateOne({ _id: updateProductDto.id }, {
-            productName : updateProductDto.productName,
-            price : updateProductDto.price,
-            discription : updateProductDto.discription,
-            status : updateProductDto.status,
-            category : updateProductDto.category,
-            updateDate : new Date()
+            productName: updateProductDto.productName,
+            price: updateProductDto.price,
+            discription: updateProductDto.discription,
+            status: updateProductDto.status,
+            category: updateProductDto.category,
+            updateDate: new Date()
         }).exec()
         return updateData
     }
 
+    async getProducts(): Promise<Product[]> {
+        const products = await this.ProductModel.aggregate([
+            {
+                $project: {
+                    productName: 1,
+                    discription: 1,
+                    category: 1,
+                    price: 1,
+                    status: 1,
+                    image: 1
+                }
+            }
+        ]).exec();
+        var i = 0;
+        products.map(element => {
+            var j = 0;
+            products[i].image.map(el => {
+                products[i].image[j] = "http://13.233.99.68:8000/public/uploads/" + products[i].image[j]
+                j++
+            })
+            i++
+        })
 
+        console.log(products);
 
-    // async getProducts(): Promise<Product[]> {
-    //     const products = await this.ProductModel.aggregate([
-    //         {
-    //             $project: {
-    //                 productName: 1,
-    //                 discription: 1,
-    //                 category: 1,
-    //                 price: 1,
-    //                 status: 1,
-    //                 image: { $concat: ["./uploads/products", "$image"] }
-    //             }
-    //         }
-    //     ]).exec();
-    //     return products;
-    // }
+        return products;
+    }
 
     async getProductById(id): Promise<Product[]> {
         var products = await this.ProductModel.find({ _id: id }).exec();
@@ -105,7 +119,7 @@ export class ProductsService {
                         category: 1,
                         price: 1,
                         status: 1,
-                        image: { $concat: ["http://13.233.99.68:8000/uploads/products/", "$image"] }
+                        image: 1
                     }
                 },
                 // { $limit: Number(pagination.limit) },
@@ -113,6 +127,18 @@ export class ProductsService {
             ]
             ).exec()
             //   var productsCount = await this.ProductModel.countDocuments().exec();
+            var i = 0;
+            products.map(element => {
+                var j = 0;
+                products[i].image.map(el => {
+                    products[i].image[j] = "http://13.233.99.68:8000/public/uploads/" + products[i].image[j]
+                    j++
+                })
+                i++
+            })
+
+
+
             return { products };
         }
         else {
