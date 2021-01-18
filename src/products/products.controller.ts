@@ -16,6 +16,7 @@ import {
 import { ProductsService } from './products.service';
 import { AddProductDto } from './dto/addProduct.dto';
 import { updateProductDto } from './dto/updateProduct.dto';
+import { deleteImageDto } from './dto/deleteImage.dto';
 import { FileInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -32,7 +33,7 @@ export class ProductsController {
             ],
             {
                 storage: diskStorage({
-                    destination: './uploads/multiple',
+                    destination: './uploads/products',
                     filename: (req, file, cb) => {
                         const randomName = Array(32)
                             .fill(null)
@@ -105,6 +106,32 @@ export class ProductsController {
         }
         const data = await this.productsService.updateproduct(image, updateProductDto);
         return res.status(HttpStatus.OK).json({ status: true, data: data, message: 'Product updated successfully' });
+    }
+
+
+    @Post('deleteImage')
+    @UseInterceptors(
+        FileFieldsInterceptor(
+            [
+                { name: 'image', maxCount: 100 },
+            ],
+            {
+                storage: diskStorage({
+                    destination: './uploads/products',
+                    filename: (req, file, cb) => {
+                        const randomName = Array(32)
+                            .fill(null)
+                            .map(() => Math.round(Math.random() * 16).toString(16))
+                            .join('');
+                        return cb(null, `${randomName}${extname(file.originalname)}`);
+                    },
+                }),
+            },
+        ),
+    )
+    async deleteImage(@UploadedFile() image, @Res() res, @Body() deleteImageDto: deleteImageDto,) {
+        console.log(deleteImageDto.image);
+        return res.json(image)
     }
 
 }

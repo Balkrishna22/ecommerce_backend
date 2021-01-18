@@ -75,20 +75,25 @@ export class ProductsService {
         products.map(element => {
             var j = 0;
             products[i].image.map(el => {
-                products[i].image[j] = "http://13.233.99.68:8000/public/uploads/" + products[i].image[j]
+                products[i].image[j] = "http://13.233.99.68:8000/uploads/products/" + products[i].image[j]
                 j++
             })
             i++
         })
-
-        console.log(products);
-
         return products;
     }
 
     async getProductById(id): Promise<Product[]> {
         var products = await this.ProductModel.find({ _id: id }).exec();
-        products[0].image = "http://13.233.99.68:8000/uploads/products/" + products[0].image
+        var i = 0;
+        products.map(element => {
+            var j = 0;
+            products[i].image.map(el => {
+                products[i].image[j] = "http://13.233.99.68:8000/uploads/products/" + products[i].image[j]
+                j++
+            })
+            i++
+        })
         return products;
     }
 
@@ -131,7 +136,7 @@ export class ProductsService {
             products.map(element => {
                 var j = 0;
                 products[i].image.map(el => {
-                    products[i].image[j] = "http://13.233.99.68:8000/public/uploads/" + products[i].image[j]
+                    products[i].image[j] = "http://13.233.99.68:8000/uploads/products/" + products[i].image[j]
                     j++
                 })
                 i++
@@ -204,8 +209,6 @@ export class ProductsService {
 
 
     }
-
-
 
     async countProducts(getData) {
         const counts = await this.ProductModel.find({ category: getData })
